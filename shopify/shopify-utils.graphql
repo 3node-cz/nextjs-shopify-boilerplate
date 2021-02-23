@@ -1,0 +1,34 @@
+query webhookSubscriptions {
+  webhookSubscriptions(first: 100) {
+    edges {
+      node {
+        id
+        topic
+      }
+    }
+  }
+}
+
+mutation webhookSubscriptionDelete($id: ID!) {
+  webhookSubscriptionDelete(id: $id) {
+    deletedWebhookSubscriptionId
+    userErrors {
+      message
+      field
+    }
+  }
+}
+mutation webhookSubscriptionCreate(
+  $topic: WebhookSubscriptionTopic!
+  $webhookSubscription: WebhookSubscriptionInput!
+) {
+  webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {
+    userErrors {
+      field
+      message
+    }
+    webhookSubscription {
+      id
+    }
+  }
+}
