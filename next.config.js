@@ -6,6 +6,6 @@ module.exports = {
         source: '/:path*',
         destination: '/',
       },
-    ];
+    ]
   },
-};
+}

@@ -1,0 +1,21 @@
+schema: 'schema.json'
+documents: '**/*.graphql'
+overwrite: true
+generates:
+  generated/sdk.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-resolvers'
+      - 'typescript-graphql-request'
+  generated/graphql.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-resolvers'
+      - 'typescript-react-apollo'
+    config:
+      # Optionals
+      withHOC: false
+      withComponent: false
+      withHooks: true
