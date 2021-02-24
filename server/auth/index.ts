@@ -1,10 +1,79 @@
 import qs from 'querystring'
 import crypto from 'crypto'
 import { Method, StatusCode, Header } from '@shopify/network'
-import { intersection } from 'lodash'
 import Koa from 'koa'
-import { NextPageContext } from 'next'
-// import config from '../config'
+import { PrismaClient } from '@prisma/client'
+import { getVerifiedData, createClient, clearWebhooks, registerWebhooks } from '@/shopify'
+import redirectPage from './redirectPage'
+import { WebhookSubscriptionTopic } from '@/generated/sdk'
+
+export const handleCallback = (db: PrismaClient) => async (ctx: Koa.Context) => {
+  const data = await handleAuthCallback(ctx)
+
+  const shopOrigin = ctx.query.shop as string
+  const shop = await db.shop.findUnique({ where: { shopOrigin } })
+  const token = data.access_token as string
+
+  await db.shop.update({
+    where: { shopOrigin },
+    data: {
+      nonce: null,
+      token,
+      updatedAt: new Date(),
+    },
+  })
+
+  const client = createClient(shop.shopOrigin, token)
+
+  await clearWebhooks(client)
+
+  await registerWebhooks(
+    client,
+    WebhookSubscriptionTopic.AppUninstalled,
+    `https://${ctx.req.headers.host}/api/webhooks/app_uninstalled`,
+  )
+
+  ctx.redirect(`/?${qs.stringify(ctx.query)}`)
+  return
+}
+
+export const verifyRequest = (db: PrismaClient) => async (ctx: Koa.Context, next: Koa.Next) => {
+  const isValid = validateHmac(ctx)
+
+  if (!isValid) {
+    ctx.status = 400
+    ctx.body = 'Bad request'
+    return
+  } else {
+    const shopOrigin = ctx.query.shop as string
+    const shop = ctx.query.shop ? await db.shop.findUnique({ where: { shopOrigin } }) : null
+    const scopes = shop && shop.token ? await getScopes(shopOrigin, shop.token) : null
+
+    if (!scopes) {
+      const { url, nonce } = getAuthorizationUrl(ctx)
+
+      if (!shop) {
+        await db.shop.upsert({
+          where: { shopOrigin },
+          create: {
+            shopOrigin,
+            nonce,
+          },
+          update: {
+            nonce,
+          },
+        })
+      }
+
+      ctx.body = redirectPage({
+        origin: shopOrigin,
+        redirectTo: url,
+        apiKey: process.env.SHOPIFY_API_KEY,
+      })
+    }
+  }
+  return next()
+}
 
 export const scopesAreSame = (serverScopes: string, tokenScopes: string) => {
   const scArr = serverScopes.split(',')
@@ -18,7 +87,7 @@ export const scopesAreSame = (serverScopes: string, tokenScopes: string) => {
   }
 }
 
-export const validateHmac = (ctx: NextPageContext) => {
+export const validateHmac = (ctx: Koa.Context) => {
   const { hmac, ...map } = ctx.query
   if (!hmac) return false
 
@@ -34,7 +103,7 @@ export const validateHmac = (ctx: NextPageContext) => {
   return crypto.timingSafeEqual(providedHmac, generatedHash)
 }
 
-export const getAuthorizationUrl = (ctx: NextPageContext, scopeChanged?: boolean) => {
+export const getAuthorizationUrl = (ctx: Koa.Context, scopeChanged?: boolean) => {
   const redirect_uri = encodeURI(`https://${ctx.req.headers.host}/auth/callback`)
   const nonce = crypto.randomBytes(16).toString('base64')
   const scopes = process.env.SCOPES
@@ -47,7 +116,7 @@ export const getAuthorizationUrl = (ctx: NextPageContext, scopeChanged?: boolean
   return { url, nonce }
 }
 
-export const authorizeRedirect = (ctx: NextPageContext, scopeChanged?: boolean) => {
+export const authorizeRedirect = (ctx: Koa.Context, scopeChanged?: boolean) => {
   console.log(ctx.req.headers.host)
   const { url } = getAuthorizationUrl(ctx, scopeChanged)
 
@@ -55,7 +124,7 @@ export const authorizeRedirect = (ctx: NextPageContext, scopeChanged?: boolean) 
   ctx.res.end()
 }
 
-export const handleAuthCallback = async (ctx: NextPageContext) => {
+export const handleAuthCallback = async (ctx: Koa.Context) => {
   const { shop, code } = ctx.query
   const url = `https://${ctx.query.shop}/admin/oauth/access_token`
 

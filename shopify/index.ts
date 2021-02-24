@@ -7,6 +7,11 @@ import 'isomorphic-fetch'
 import { GraphQLClient } from 'graphql-request'
 import { getSdk, Sdk, WebhookSubscriptionTopic } from '@/generated/sdk'
 
+import Koa from 'koa'
+import { PrismaClient } from '@prisma/client'
+
+import got, { Method } from 'got'
+
 export const createClient = (shop: string, accessToken: string) => {
   const gqlClient = new GraphQLClient(`https://${shop}/admin/api/2021-01/graphql.json`, {
     headers: {
@@ -41,7 +46,6 @@ export const proxy = (
     headers: {
       'Content-Type': 'application/json',
       'X-Shopify-Access-Token': accessToken,
-      'User-Agent': `shopify-app-node ${process.env.npm_package_version} | Shopify App CLI`,
     },
     body: JSON.stringify(req.body),
   })
@@ -51,6 +55,40 @@ export const proxy = (
       res.json({ error })
     })
     .pipe(res)
+}
+
+export const proxyGraphql = (db: PrismaClient) => async (ctx: Koa.Context) => {
+  const data = await getVerifiedData(ctx.headers.authorization)
+  const shop = await db.shop.findUnique({ where: { shopOrigin: new URL(data.dest).host } })
+
+  // const response = await got(`https://${shop.shopOrigin}/admin/api/2021-01/graphql.json`, {
+  //   method: ctx.method as Method,
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     'X-Shopify-Access-Token': shop.token,
+  //   },
+  //   body: JSON.stringify(ctx.body)
+  // })
+
+  const proxy = request({
+    url: `https://${shop.shopOrigin}/admin/api/2021-01/graphql.json`,
+    method: ctx.method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Access-Token': shop.token,
+    },
+    body: JSON.stringify(ctx.body),
+  })
+
+  ctx.body = proxy
+
+  // return next()
+
+  // proxy
+  //   .on('error', (error) => {
+  //     res.json({ error })
+  //   })
+  //   .pipe(res)
 }
 
 export const clearWebhooks = async (client: Sdk) => {

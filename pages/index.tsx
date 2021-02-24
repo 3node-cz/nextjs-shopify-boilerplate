@@ -6,7 +6,7 @@ import { createApp } from '@shopify/app-bridge'
 import { Redirect } from '@shopify/app-bridge/actions'
 import { authenticatedFetch, getSessionToken } from '@shopify/app-bridge-utils'
 import App from '@/modules/App'
-import { PrismaClient } from '@prisma/client'
+import db from '@/db'
 import { getAuthorizationUrl, getScopes, scopesAreSame, validateHmac } from 'auth'
 
 import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'
@@ -20,7 +20,7 @@ const Index = ({ config, redirectUrl }) => {
 
   const client = new ApolloClient({
     link: new HttpLink({
-      uri: `/api/shopify`,
+      uri: `/graphql`,
       credentials: 'include',
       fetch: authenticatedFetch(app),
     }),
@@ -47,7 +47,6 @@ const Index = ({ config, redirectUrl }) => {
 
 export const getServerSideProps = async (ctx: NextPageContext) => {
   const shopOrigin = ctx.query.shop as string
-  const db = new PrismaClient()
   const shop = ctx.query.shop ? await db.shop.findUnique({ where: { shopOrigin } }) : null
   const scopes = shop && shop.token ? await getScopes(shopOrigin, shop.token) : null
 
