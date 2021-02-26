@@ -2,10 +2,7 @@ import React from 'react'
 import { useOrdersQuery } from '@/generated/graphql'
 import { Page, Card, Spinner } from '@shopify/polaris'
 import { TitleBar } from '@shopify/app-bridge-react'
-
-function nfe<T>(obj: { edges: { node: T }[] }) {
-  return obj.edges.map((i) => i.node)
-}
+import { nodeFromEdges as nfe } from '@/lib/shopify/utils'
 
 const Home = () => {
   const { data, error, loading } = useOrdersQuery()

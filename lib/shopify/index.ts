@@ -29,6 +29,7 @@ interface ISessionToken {
   jti: string
   sid: string
 }
+
 export const getVerifiedData = (authorizationHeader): Promise<ISessionToken> =>
   new Promise((resolve, reject) => {
     try {

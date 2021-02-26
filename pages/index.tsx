@@ -5,7 +5,7 @@ import { Provider } from '@shopify/app-bridge-react'
 import { createApp } from '@shopify/app-bridge'
 import { Redirect } from '@shopify/app-bridge/actions'
 import { authenticatedFetch, getSessionToken } from '@shopify/app-bridge-utils'
-import App from '@/modules/App'
+import App from '@/components/App'
 import { verifyRequest } from '@/lib/auth'
 
 import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'

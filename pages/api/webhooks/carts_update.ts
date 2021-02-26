@@ -9,3 +9,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   res.json('ok')
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}

@@ -3,6 +3,12 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getWebhook } from '@/lib/auth'
 import db from '@/lib/db'
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
+
 const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
   const webhook = await getWebhook(req)
 
