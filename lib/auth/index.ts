@@ -1,5 +1,6 @@
 import qs from 'querystring'
 import crypto from 'crypto'
+import Cryptr from 'cryptr'
 import { Method, StatusCode, Header } from '@shopify/network'
 import db from '@/lib/db'
 import { NextApiRequest, NextPageContext } from 'next'
@@ -14,14 +15,17 @@ export const handleCallback = async (ctx: NextPageContext) => {
 
   const shop = await db.shop.findUnique({ where: { shopOrigin } })
 
+  const c = new Cryptr(process.env.SHOPIFY_API_SECRET)
+
   const data = await handleAuthCallback(ctx)
   const token = data.access_token as string
+  const encryptetToken = c.encrypt(token)
 
   await db.shop.update({
     where: { shopOrigin },
     data: {
       nonce: null,
-      token,
+      token: encryptetToken,
       updatedAt: new Date(),
     },
   })
@@ -93,9 +97,9 @@ export const getWebhook = async (req: NextApiRequest): Promise<IWebhookVerificat
 
 export const verifyRequest = async (ctx: NextPageContext) => {
   const shopOrigin = ctx.query.shop as string
-
+  const c = new Cryptr(process.env.SHOPIFY_API_SECRET)
   const shop = ctx.query.shop ? await db.shop.findUnique({ where: { shopOrigin } }) : null
-  const scopes = shop && shop.token ? await getScopes(shopOrigin, shop.token) : null
+  const scopes = shop && shop.token ? await getScopes(shopOrigin, c.decrypt(shop.token)) : null
 
   // if (!validateHmac(ctx)) {
   //   ctx.res.writeHead(400, 'Bad request')
