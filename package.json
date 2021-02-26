@@ -37,6 +37,7 @@
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.2.0",
     "request": "^2.88.2",
+    "safe-compare": "^1.1.4",
     "shopify-jwt-auth-verify": "^1.0.10",
     "ts-dotenv": "^0.8.3",
     "verify-shopify-webhook": "^1.0.5"
@@ -58,6 +59,7 @@
     "@types/react-dom": "^16.9.4",
     "@types/react-router-dom": "^5.1.6",
     "@types/request": "^2.48.5",
+    "@types/safe-compare": "^1.1.0",
     "apollo-hooks-codegen": "^1.2.0",
     "prisma": "2.16.1",
     "ts-node": "^9.1.1",

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
-import { proxy, getVerifiedData } from '@/shopify'
+import { proxy, getVerifiedData } from '@/lib/shopify'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const db = new PrismaClient()

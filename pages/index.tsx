@@ -6,8 +6,7 @@ import { createApp } from '@shopify/app-bridge'
 import { Redirect } from '@shopify/app-bridge/actions'
 import { authenticatedFetch, getSessionToken } from '@shopify/app-bridge-utils'
 import App from '@/modules/App'
-import { PrismaClient } from '@prisma/client'
-import { getAuthorizationUrl, getScopes, scopesAreSame, validateHmac } from 'auth'
+import { verifyRequest } from '@/lib/auth'
 
 import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'
 
@@ -46,64 +45,8 @@ const Index = ({ config, redirectUrl }) => {
 }
 
 export const getServerSideProps = async (ctx: NextPageContext) => {
-  const shopOrigin = ctx.query.shop as string
-  const db = new PrismaClient()
-  const shop = ctx.query.shop ? await db.shop.findUnique({ where: { shopOrigin } }) : null
-  const scopes = shop && shop.token ? await getScopes(shopOrigin, shop.token) : null
-
-  if (!validateHmac(ctx)) {
-    ctx.res.writeHead(400, 'Bad request')
-    ctx.res.write('Bad request')
-    ctx.res.end()
-    return {
-      props: {},
-    }
-  }
-
-  if (!scopes) {
-    const { url, nonce } = getAuthorizationUrl(ctx)
-
-    if (shop) {
-      return {
-        props: {
-          redirectUrl: url,
-          config: {
-            apiKey: process.env.SHOPIFY_API_KEY,
-            shopOrigin: ctx.query.shop,
-            forceRedirect: true,
-          },
-        },
-      }
-    }
-
-    await db.shop.upsert({
-      where: { shopOrigin },
-      create: {
-        shopOrigin,
-        nonce,
-      },
-      update: {
-        nonce,
-      },
-    })
-
-    return {
-      redirect: {
-        destination: url,
-        permanent: false,
-      },
-    }
-  }
-
-  return {
-    props: {
-      config: {
-        apiKey: process.env.SHOPIFY_API_KEY,
-        shopOrigin: ctx.query.shop,
-        forceRedirect: true,
-      },
-    },
-  }
+  const props = await verifyRequest(ctx)
+  return props
 }
 
 export default Index

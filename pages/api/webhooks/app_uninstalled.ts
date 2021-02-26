@@ -1,16 +1,21 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-import { webhookVerification } from '@/shopify'
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const db = new PrismaClient()
+import { getWebhook } from '@/lib/auth'
+import db from '@/lib/db'
 
-  const webhook = await webhookVerification(req)
+const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
+  const webhook = await getWebhook(req)
+
+  console.log(webhook)
+
   if (webhook.verified) {
+    // await db.shop.delete({ where: { shopOrigin: webhook.domain as string } })
+
     const shop = await db.shop.update({
       where: { shopOrigin: webhook.domain as string },
       data: {
         token: null,
+        updatedAt: new Date(),
       },
     })
   } else {
@@ -18,6 +23,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   res.json({ message: 'ok' })
-
-  await db.$disconnect()
 }
+
+export default webhook
