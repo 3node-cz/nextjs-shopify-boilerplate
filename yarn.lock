@@ -2118,16 +2118,17 @@
     hsluv "^0.1.0"
     tslib "^1.14.1"
 
-"@shopify/polaris@^6.0.1":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@shopify/polaris/-/polaris-6.0.1.tgz#c809b23396bd7cc539f788b84c3e7a7702afa882"
-  integrity sha512-3uDmySj7IBYc7TXrsq9NZqiMGEBqTh5Mgt7aI0gcDJag8JK7+7rek+k+05DWoERQN7vXUdS8EAo0dFnz0YhYLw==
+"@shopify/polaris@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@shopify/polaris/-/polaris-6.1.0.tgz#18c71c158b4b408040caf36d02ebfb38b1db84fd"
+  integrity sha512-9253DwSI0FZqkrUvwsrSF9qZpybJO5MF7/IpoxWGTifqbBjGnx+8zr1aiWPgiKqAQBDc3vsIgCJVs5QGtJ/3/w==
   dependencies:
     "@shopify/polaris-icons" "^4.1.0"
     "@shopify/polaris-tokens" "^2.16.0"
     "@types/react" "^16.9.12"
     "@types/react-dom" "^16.9.4"
     "@types/react-transition-group" "^4.4.0"
+    focus-visible "^5.2.0"
     lodash "^4.17.4"
     react-transition-group "^4.4.1"
 
@@ -4872,6 +4873,11 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
+
+focus-visible@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/focus-visible/-/focus-visible-5.2.0.tgz#3a9e41fccf587bd25dcc2ef045508284f0a4d6b3"
+  integrity sha512-Rwix9pBtC1Nuy5wysTmKy+UjbDJpIfg8eHjw0rjZ1mX4GNLz1Bmd16uDpI3Gk1i70Fgcs8Csg2lPm8HULFg9DQ==
 
 follow-redirects@^1.0.0, follow-redirects@^1.10.0:
   version "1.13.2"

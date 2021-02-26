@@ -6,5 +6,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data = await getVerifiedData(req.headers.authorization)
   const shop = await db.shop.findUnique({ where: { shopOrigin: new URL(data.dest).host } })
 
-  proxy(shop.shopOrigin, shop.token, req, res)
+  // proxy(shop.shopOrigin, shop.token, req, res)
 }

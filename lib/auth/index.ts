@@ -52,17 +52,11 @@ interface IWebhookVerification {
   apiVersion: string
   domain: string
   topic: string
-  data: any
+  payload: any
 }
 
-export const getWebhook = (req: NextApiRequest): Promise<IWebhookVerification> => {
-  return new Promise<IWebhookVerification>((resolve) => {
-    // We'll compare the hmac to our own hash
-    const hmac = req.headers['x-shopify-hmac-sha256'] as string
-    const apiVersion = req.headers['x-shopify-api-version'] as string
-    const domain = req.headers['x-shopify-shop-domain'] as string
-    const topic = req.headers['x-shopify-topic'] as string
-
+const readBodyToText = (req: NextApiRequest) =>
+  new Promise<string>((resolve) => {
     let data = ''
 
     req.on('data', (chunk) => {
@@ -70,20 +64,31 @@ export const getWebhook = (req: NextApiRequest): Promise<IWebhookVerification> =
     })
 
     req.on('end', () => {
-      const calculatedHmac = crypto
-        .createHmac('sha256', process.env.SHOPIFY_API_SECRET as string)
-        .update(data, 'utf8')
-        .digest('base64')
-
-      resolve({
-        verified: safeCompare(hmac, calculatedHmac),
-        apiVersion,
-        domain,
-        topic,
-        data: JSON.parse(data),
-      })
+      resolve(data)
     })
   })
+
+export const getWebhook = async (req: NextApiRequest): Promise<IWebhookVerification> => {
+  // We'll compare the hmac to our own hash
+  const hmac = req.headers['x-shopify-hmac-sha256'] as string
+  const apiVersion = req.headers['x-shopify-api-version'] as string
+  const domain = req.headers['x-shopify-shop-domain'] as string
+  const topic = req.headers['x-shopify-topic'] as string
+
+  const data = req.body ? JSON.stringify(req.body) : await readBodyToText(req)
+
+  const calculatedHmac = crypto
+    .createHmac('sha256', process.env.SHOPIFY_API_SECRET as string)
+    .update(data, 'utf8')
+    .digest('base64')
+
+  return {
+    verified: safeCompare(hmac, calculatedHmac),
+    apiVersion,
+    domain,
+    topic,
+    payload: JSON.parse(data),
+  }
 }
 
 export const verifyRequest = async (ctx: NextPageContext) => {

@@ -18,12 +18,27 @@ export const createClient = (shop: string, accessToken: string) => {
   return getSdk(gqlClient)
 }
 
-export const getVerifiedData = (authorizationHeader): any =>
+interface ISessionToken {
+  iss: string
+  dest: string
+  aud: string
+  sub: string
+  exp: number
+  nbf: number
+  iat: number
+  jti: string
+  sid: string
+}
+export const getVerifiedData = (authorizationHeader): Promise<ISessionToken> =>
   new Promise((resolve, reject) => {
     try {
-      isVerified(authorizationHeader, process.env.SHOPIFY_API_SECRET, (data) => {
-        resolve(JSON.parse(data.payload))
-      })
+      isVerified(
+        authorizationHeader,
+        process.env.SHOPIFY_API_SECRET,
+        (data: Record<'header' | 'payload' | 'signature', string>) => {
+          resolve(JSON.parse(data.payload) as ISessionToken)
+        },
+      )
     } catch (e) {
       reject(e)
     }

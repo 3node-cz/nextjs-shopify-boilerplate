@@ -12,7 +12,7 @@ const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
     // await db.shop.delete({ where: { shopOrigin: webhook.domain as string } })
 
     const shop = await db.shop.update({
-      where: { shopOrigin: webhook.domain as string },
+      where: { shopOrigin: webhook.domain },
       data: {
         token: null,
         updatedAt: new Date(),
