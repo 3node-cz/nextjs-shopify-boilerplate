@@ -1,15 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-
 import { getWebhook } from '@/lib/auth'
 import db from '@/lib/db'
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
+const webhook_app_uninstalled = async (req: NextApiRequest, res: NextApiResponse) => {
   const webhook = await getWebhook(req)
 
   console.log(webhook)
@@ -31,4 +24,10 @@ const webhook = async (req: NextApiRequest, res: NextApiResponse) => {
   res.json({ message: 'ok' })
 }
 
-export default webhook
+export default webhook_app_uninstalled
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}

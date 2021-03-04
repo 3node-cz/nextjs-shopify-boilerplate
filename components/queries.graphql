@@ -1,0 +1,6 @@
+query shop {
+  shop {
+    shopOrigin
+    createdAt
+  }
+}

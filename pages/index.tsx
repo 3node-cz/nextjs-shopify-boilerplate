@@ -19,7 +19,7 @@ const Index = ({ config, redirectUrl }) => {
 
   const client = new ApolloClient({
     link: new HttpLink({
-      uri: `/api/shopify`,
+      uri: `/api/graphql`,
       credentials: 'include',
       fetch: authenticatedFetch(app),
     }),

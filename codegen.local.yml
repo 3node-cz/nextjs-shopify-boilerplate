@@ -1,13 +1,9 @@
-schema: 'schema.json'
-documents: '**/*.graphql'
+schema: 'graphql/*.schema.graphql'
+documents:
+  - '**/*.graphql'
+  - '!lib/shopify'
 overwrite: true
 generates:
-  generated/sdk.ts:
-    plugins:
-      - 'typescript'
-      - 'typescript-operations'
-      - 'typescript-resolvers'
-      - 'typescript-graphql-request'
   generated/graphql.ts:
     plugins:
       - 'typescript'

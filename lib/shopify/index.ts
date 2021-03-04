@@ -30,11 +30,11 @@ interface ISessionToken {
   sid: string
 }
 
-export const getVerifiedData = (authorizationHeader): Promise<ISessionToken> =>
+export const getVerifiedData = (req: NextApiRequest): Promise<ISessionToken> =>
   new Promise((resolve, reject) => {
     try {
       isVerified(
-        authorizationHeader,
+        req.headers.authorization,
         process.env.SHOPIFY_API_SECRET,
         (data: Record<'header' | 'payload' | 'signature', string>) => {
           resolve(JSON.parse(data.payload) as ISessionToken)

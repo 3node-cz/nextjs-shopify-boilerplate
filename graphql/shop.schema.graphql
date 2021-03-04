@@ -1,0 +1,12 @@
+scalar DateTime
+
+type Shop {
+  token: String!
+  shopOrigin: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+extend type Query {
+  shop: Shop!
+}

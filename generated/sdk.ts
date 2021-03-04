@@ -17461,68 +17461,6 @@ export type DeliveryProfileUpdatePayload = {
   userErrors: Array<UserError>;
 };
 
-export type OrdersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type OrdersQuery = (
-  { __typename?: 'QueryRoot' }
-  & { orders: (
-    { __typename?: 'OrderConnection' }
-    & { edges: Array<(
-      { __typename?: 'OrderEdge' }
-      & { node: (
-        { __typename?: 'Order' }
-        & Pick<Order, 'id' | 'name'>
-        & { customer?: Maybe<(
-          { __typename?: 'Customer' }
-          & Pick<Customer, 'email'>
-        )>, lineItems: (
-          { __typename?: 'LineItemConnection' }
-          & { edges: Array<(
-            { __typename?: 'LineItemEdge' }
-            & { node: (
-              { __typename?: 'LineItem' }
-              & Pick<LineItem, 'title'>
-              & { product?: Maybe<(
-                { __typename?: 'Product' }
-                & Pick<Product, 'title'>
-              )> }
-            ) }
-          )> }
-        ) }
-      ) }
-    )> }
-  ) }
-);
-
-export type ShopQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ShopQuery = (
-  { __typename?: 'QueryRoot' }
-  & { shop: (
-    { __typename?: 'Shop' }
-    & Pick<Shop, 'name'>
-  ) }
-);
-
-export type WebhookSubscriptionsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type WebhookSubscriptionsQuery = (
-  { __typename?: 'QueryRoot' }
-  & { webhookSubscriptions: (
-    { __typename?: 'WebhookSubscriptionConnection' }
-    & { edges: Array<(
-      { __typename?: 'WebhookSubscriptionEdge' }
-      & { node: (
-        { __typename?: 'WebhookSubscription' }
-        & Pick<WebhookSubscription, 'id' | 'topic'>
-      ) }
-    )> }
-  ) }
-);
-
 export type WebhookSubscriptionDeleteMutationVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -17558,6 +17496,23 @@ export type WebhookSubscriptionCreateMutation = (
       & Pick<WebhookSubscription, 'id'>
     )> }
   )> }
+);
+
+export type WebhookSubscriptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type WebhookSubscriptionsQuery = (
+  { __typename?: 'QueryRoot' }
+  & { webhookSubscriptions: (
+    { __typename?: 'WebhookSubscriptionConnection' }
+    & { edges: Array<(
+      { __typename?: 'WebhookSubscriptionEdge' }
+      & { node: (
+        { __typename?: 'WebhookSubscription' }
+        & Pick<WebhookSubscription, 'id' | 'topic'>
+      ) }
+    )> }
+  ) }
 );
 
 
@@ -24695,50 +24650,6 @@ export type DirectiveResolvers<ContextType = any> = {
  */
 export type IDirectiveResolvers<ContextType = any> = DirectiveResolvers<ContextType>;
 
-export const OrdersDocument = gql`
-    query orders {
-  orders(first: 10) {
-    edges {
-      node {
-        id
-        name
-        customer {
-          email
-        }
-        lineItems(first: 10) {
-          edges {
-            node {
-              title
-              product {
-                title
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-    `;
-export const ShopDocument = gql`
-    query shop {
-  shop {
-    name
-  }
-}
-    `;
-export const WebhookSubscriptionsDocument = gql`
-    query webhookSubscriptions {
-  webhookSubscriptions(first: 100) {
-    edges {
-      node {
-        id
-        topic
-      }
-    }
-  }
-}
-    `;
 export const WebhookSubscriptionDeleteDocument = gql`
     mutation webhookSubscriptionDelete($id: ID!) {
   webhookSubscriptionDelete(id: $id) {
@@ -24766,6 +24677,18 @@ export const WebhookSubscriptionCreateDocument = gql`
   }
 }
     `;
+export const WebhookSubscriptionsDocument = gql`
+    query webhookSubscriptions {
+  webhookSubscriptions(first: 100) {
+    edges {
+      node {
+        id
+        topic
+      }
+    }
+  }
+}
+    `;
 
 export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 
@@ -24773,20 +24696,14 @@ export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 const defaultWrapper: SdkFunctionWrapper = sdkFunction => sdkFunction();
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    orders(variables?: OrdersQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<OrdersQuery> {
-      return withWrapper(() => client.request<OrdersQuery>(print(OrdersDocument), variables, requestHeaders));
-    },
-    shop(variables?: ShopQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ShopQuery> {
-      return withWrapper(() => client.request<ShopQuery>(print(ShopDocument), variables, requestHeaders));
-    },
-    webhookSubscriptions(variables?: WebhookSubscriptionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WebhookSubscriptionsQuery> {
-      return withWrapper(() => client.request<WebhookSubscriptionsQuery>(print(WebhookSubscriptionsDocument), variables, requestHeaders));
-    },
     webhookSubscriptionDelete(variables: WebhookSubscriptionDeleteMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WebhookSubscriptionDeleteMutation> {
       return withWrapper(() => client.request<WebhookSubscriptionDeleteMutation>(print(WebhookSubscriptionDeleteDocument), variables, requestHeaders));
     },
     webhookSubscriptionCreate(variables: WebhookSubscriptionCreateMutationVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WebhookSubscriptionCreateMutation> {
       return withWrapper(() => client.request<WebhookSubscriptionCreateMutation>(print(WebhookSubscriptionCreateDocument), variables, requestHeaders));
+    },
+    webhookSubscriptions(variables?: WebhookSubscriptionsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<WebhookSubscriptionsQuery> {
+      return withWrapper(() => client.request<WebhookSubscriptionsQuery>(print(WebhookSubscriptionsDocument), variables, requestHeaders));
     }
   };
 }
