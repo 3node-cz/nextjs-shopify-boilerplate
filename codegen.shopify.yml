@@ -1,4 +1,4 @@
-schema: 'schema.json'
+schema: 'lib/shopify/schema.json'
 documents: 'lib/shopify/*.graphql'
 overwrite: true
 generates:
@@ -6,5 +6,5 @@ generates:
     plugins:
       - 'typescript'
       - 'typescript-operations'
-      - 'typescript-resolvers'
+      # - 'typescript-resolvers'
       - 'typescript-graphql-request'

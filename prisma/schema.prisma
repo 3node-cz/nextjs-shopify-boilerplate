@@ -17,6 +17,8 @@ model Shop {
   shopOrigin  String    @unique
   token       String?
 
+  scopes      String?
+  webhooks    String?
   nonce       String?
 
   createdAt DateTime @default(now())

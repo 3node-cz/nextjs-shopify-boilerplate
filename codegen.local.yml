@@ -3,6 +3,8 @@ documents:
   - '**/*.graphql'
   - '!lib/shopify'
 overwrite: true
+scalars:
+  - 'DateTime'
 generates:
   generated/graphql.ts:
     plugins:

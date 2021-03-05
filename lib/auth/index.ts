@@ -20,12 +20,15 @@ export const handleCallback = async (ctx: NextPageContext) => {
   const data = await handleAuthCallback(ctx)
   const token = data.access_token as string
   const encryptetToken = c.encrypt(token)
+  const webhooks = await getWebhooksHandlers()
 
   await db.shop.update({
     where: { shopOrigin },
     data: {
       nonce: null,
       token: encryptetToken,
+      scopes: process.env.SCOPES,
+      webhooks: webhooks.join(','),
       updatedAt: new Date(),
     },
   })
@@ -33,8 +36,6 @@ export const handleCallback = async (ctx: NextPageContext) => {
   const client = createClient(shop.shopOrigin, token)
 
   await clearWebhooks(client)
-
-  const webhooks = await getWebhooks()
 
   await Promise.all(
     webhooks.map((w) =>
@@ -110,6 +111,25 @@ export const verifyRequest = async (ctx: NextPageContext) => {
   //   }
   // }
 
+  const webhooks = await getWebhooksHandlers()
+  const appConfigChanged = shop
+    ? shop.scopes !== process.env.SCOPES || shop.webhooks !== webhooks.join(',')
+    : false
+
+  if (appConfigChanged) {
+    const { url, nonce } = getAuthorizationUrl(ctx, true)
+
+    return {
+      props: {
+        redirectUrl: url,
+        config: {
+          apiKey: process.env.SHOPIFY_API_KEY,
+          shopOrigin: ctx.query.shop,
+          forceRedirect: true,
+        },
+      },
+    }
+  }
   if (!scopes) {
     const { url, nonce } = getAuthorizationUrl(ctx)
 
@@ -170,7 +190,7 @@ export const scopesAreSame = (serverScopes: string, tokenScopes: string) => {
   }
 }
 
-const getWebhooks = async () => {
+export const getWebhooksHandlers = async () => {
   const webhooksDirectory = path.join(process.cwd(), 'pages/api/webhooks')
   const webhooksFiles = fs.readdirSync(webhooksDirectory)
 

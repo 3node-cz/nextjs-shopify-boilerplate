@@ -1,12 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useShopQuery } from '@/generated/graphql'
 import { Page, Card, Spinner } from '@shopify/polaris'
 import { TitleBar } from '@shopify/app-bridge-react'
-import { nodeFromEdges as nfe } from '@/lib/shopify/utils'
-import { Link } from 'react-router-dom'
+import Link from '@/modules/components/Link'
 
 const Home = () => {
-  const { data, error, loading } = useShopQuery()
+  const { data, error, loading, refetch } = useShopQuery()
 
   return (
     <Page title="Testing app">
@@ -23,14 +22,6 @@ const Home = () => {
           <Card.Section>
             {data.shop.shopOrigin} {data.shop.createdAt}
           </Card.Section>
-          {/* {nfe(data.orders).map((o) => (
-            <Card.Section key={o.id}>
-              <p>{o.customer?.email}</p>
-              {nfe(o.lineItems).map((i) => (
-                <p>{i.title}</p>
-              ))}
-            </Card.Section>
-          ))} */}
         </Card>
       )}
     </Page>

@@ -3,6 +3,8 @@ import request from 'request'
 import isVerified from 'shopify-jwt-auth-verify'
 import verifyWebhook from 'verify-shopify-webhook'
 import 'isomorphic-fetch'
+import Cryptr from 'cryptr'
+import db from '@/lib/db'
 
 import { GraphQLClient } from 'graphql-request'
 import { getSdk, Sdk, WebhookSubscriptionTopic } from '@/generated/sdk'
@@ -16,6 +18,13 @@ export const createClient = (shop: string, accessToken: string) => {
   })
 
   return getSdk(gqlClient)
+}
+
+export const createAuthenticatedClient = async (shopOrigin) => {
+  const shop = await db.shop.findUnique({ where: { shopOrigin } })
+  const c = new Cryptr(process.env.SHOPIFY_API_SECRET)
+
+  return createClient(shopOrigin, c.decrypt(shop.token))
 }
 
 interface ISessionToken {

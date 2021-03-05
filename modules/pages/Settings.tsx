@@ -1,7 +1,7 @@
 import { useShopQuery } from '@/generated/graphql'
 import { Page, Card, Spinner } from '@shopify/polaris'
 import { TitleBar } from '@shopify/app-bridge-react'
-import { Link } from 'react-router-dom'
+import Link from '@/modules/components/Link'
 
 const Settings = () => {
   const { data } = useShopQuery()
