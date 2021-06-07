@@ -121,13 +121,17 @@ export const verifyRequest = async (ctx: NextPageContext) => {
 
     return {
       props: {
-        redirectUrl: url,
-        config: {
-          apiKey: process.env.SHOPIFY_API_KEY,
-          shopOrigin: ctx.query.shop,
-          forceRedirect: true,
+        redirect: {
+          destination: url,
         },
-      },
+        props: {
+          redirectUrl: url,
+          config: {
+            apiKey: process.env.SHOPIFY_API_KEY,
+            shopOrigin: ctx.query.shop,
+            forceRedirect: true,
+          },
+        }
     }
   }
   if (!scopes) {
