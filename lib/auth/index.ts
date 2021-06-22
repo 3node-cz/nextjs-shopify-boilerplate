@@ -131,52 +131,53 @@ export const verifyRequest = async (ctx: NextPageContext) => {
             shopOrigin: ctx.query.shop,
             forceRedirect: true,
           },
-        }
+        },
+      },
     }
-  }
-  if (!scopes) {
-    const { url, nonce } = getAuthorizationUrl(ctx)
+    if (!scopes) {
+      const { url, nonce } = getAuthorizationUrl(ctx)
 
-    if (shop && shop.token) {
-      return {
-        props: {
-          redirectUrl: url,
-          config: {
-            apiKey: process.env.SHOPIFY_API_KEY,
-            shopOrigin: ctx.query.shop,
-            forceRedirect: true,
+      if (shop && shop.token) {
+        return {
+          props: {
+            redirectUrl: url,
+            config: {
+              apiKey: process.env.SHOPIFY_API_KEY,
+              shopOrigin: ctx.query.shop,
+              forceRedirect: true,
+            },
           },
+        }
+      }
+
+      await db.shop.upsert({
+        where: { shopOrigin },
+        create: {
+          shopOrigin,
+          nonce,
+        },
+        update: {
+          nonce,
+        },
+      })
+
+      return {
+        redirect: {
+          destination: url,
+          permanent: false,
         },
       }
     }
 
-    await db.shop.upsert({
-      where: { shopOrigin },
-      create: {
-        shopOrigin,
-        nonce,
-      },
-      update: {
-        nonce,
-      },
-    })
-
     return {
-      redirect: {
-        destination: url,
-        permanent: false,
+      props: {
+        config: {
+          apiKey: process.env.SHOPIFY_API_KEY,
+          shopOrigin: ctx.query.shop,
+          forceRedirect: true,
+        },
       },
     }
-  }
-
-  return {
-    props: {
-      config: {
-        apiKey: process.env.SHOPIFY_API_KEY,
-        shopOrigin: ctx.query.shop,
-        forceRedirect: true,
-      },
-    },
   }
 }
 
