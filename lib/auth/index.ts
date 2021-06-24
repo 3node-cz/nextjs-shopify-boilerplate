@@ -129,6 +129,7 @@ export const verifyRequest = async (ctx: NextPageContext) => {
           config: {
             apiKey: process.env.SHOPIFY_API_KEY,
             shopOrigin: ctx.query.shop,
+            host: ctx.query.host,
             forceRedirect: true,
           },
         },
@@ -145,6 +146,7 @@ export const verifyRequest = async (ctx: NextPageContext) => {
           config: {
             apiKey: process.env.SHOPIFY_API_KEY,
             shopOrigin: ctx.query.shop,
+            host: ctx.query.host,
             forceRedirect: true,
           },
         },
@@ -175,6 +177,7 @@ export const verifyRequest = async (ctx: NextPageContext) => {
       config: {
         apiKey: process.env.SHOPIFY_API_KEY,
         shopOrigin: ctx.query.shop,
+        host: ctx.query.host,
         forceRedirect: true,
       },
     },
