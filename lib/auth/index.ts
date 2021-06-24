@@ -134,50 +134,50 @@ export const verifyRequest = async (ctx: NextPageContext) => {
         },
       },
     }
-    if (!scopes) {
-      const { url, nonce } = getAuthorizationUrl(ctx)
+  }
+  if (!scopes) {
+    const { url, nonce } = getAuthorizationUrl(ctx)
 
-      if (shop && shop.token) {
-        return {
-          props: {
-            redirectUrl: url,
-            config: {
-              apiKey: process.env.SHOPIFY_API_KEY,
-              shopOrigin: ctx.query.shop,
-              forceRedirect: true,
-            },
-          },
-        }
-      }
-
-      await db.shop.upsert({
-        where: { shopOrigin },
-        create: {
-          shopOrigin,
-          nonce,
-        },
-        update: {
-          nonce,
-        },
-      })
-
+    if (shop && shop.token) {
       return {
-        redirect: {
-          destination: url,
-          permanent: false,
+        props: {
+          redirectUrl: url,
+          config: {
+            apiKey: process.env.SHOPIFY_API_KEY,
+            shopOrigin: ctx.query.shop,
+            forceRedirect: true,
+          },
         },
       }
     }
+
+    await db.shop.upsert({
+      where: { shopOrigin },
+      create: {
+        shopOrigin,
+        nonce,
+      },
+      update: {
+        nonce,
+      },
+    })
 
     return {
-      props: {
-        config: {
-          apiKey: process.env.SHOPIFY_API_KEY,
-          shopOrigin: ctx.query.shop,
-          forceRedirect: true,
-        },
+      redirect: {
+        destination: url,
+        permanent: false,
       },
     }
+  }
+
+  return {
+    props: {
+      config: {
+        apiKey: process.env.SHOPIFY_API_KEY,
+        shopOrigin: ctx.query.shop,
+        forceRedirect: true,
+      },
+    },
   }
 }
 

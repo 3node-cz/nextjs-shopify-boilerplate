@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { getWebhook } from '@/lib/auth'
-import db from '../../prisma'
+
 
 // Requests deletion of shop data.
 // https://shopify.dev/tutorials/add-gdpr-webhooks-to-your-app#shop-redact
